@@ -47,23 +47,66 @@
         padding-left: 10px;
         margin-bottom: 4px;
       }
-      #logoutBtn {
-        background: #f44336;
-        color: white;
+
+      /* NEW - Hamburger menu styling */
+      .hamburger {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        width: 30px;
+        cursor: pointer;
+      }
+      .bar {
+        height: 3px;
+        background-color: #333;
+        margin: 5px 0;
+        border-radius: 2px;
+      }
+      .menu {
+        position: absolute;
+        top: 60px;
+        right: 20px;
+        background: white;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 6px;
+        display: none;
+        flex-direction: column;
+        min-width: 120px;
+        z-index: 1000;
+      }
+      .menu.show {
+        display: flex;
+      }
+      .menu button {
+        background: none;
         border: none;
-        border-radius: 5px;
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 20px;
-        font-weight: bold;
-        font-size: 1.1em;
+        padding: 12px;
+        text-align: left;
+        font-size: 1em;
+        cursor: pointer;
+      }
+      .menu button:hover {
+        background: #f0f0f0;
       }
     </style>
   </head>
   <body>
     <h1>Transaction Tracker</h1>
 
-    <button id="logoutBtn">Log Out</button>
+    <!-- NEW - Hamburger menu toggle -->
+    <div class="hamburger" id="hamburger">
+      <div class="bar"></div>
+      <div class="bar"></div>
+      <div class="bar"></div>
+    </div>
+
+    <!-- NEW - Dropdown menu -->
+    <div class="menu" id="menu">
+      <button id="logoutBtn">Log Out</button>
+    </div>
 
     <form id="transactionForm">
       <input
@@ -112,7 +155,15 @@
       const monthSelect = document.getElementById("monthSelect");
       const transactionList = document.getElementById("transactionList");
 
+      const hamburger = document.getElementById("hamburger");
+      const menu = document.getElementById("menu");
+
       let transactions = [];
+
+      // Toggle menu
+      hamburger.addEventListener("click", () => {
+        menu.classList.toggle("show");
+      });
 
       async function checkAuth() {
         const {
@@ -144,7 +195,6 @@
         const { data: user } = await supabase.auth.getUser();
         if (!user) return alert("User not logged in.");
 
-        // Insert transaction linked to current user
         const { error } = await supabase
           .from("transactions")
           .insert([{ location, category, amount, date, user_id: user.id }]);
@@ -161,7 +211,6 @@
         renderTransactions();
       });
 
-      // Format YYYY-MM for month key
       function formatMonthKey(dateStr) {
         const d = new Date(dateStr);
         return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
@@ -180,7 +229,6 @@
         const { data: user } = await supabase.auth.getUser();
         if (!user) return;
 
-        // Fetch all transactions for this user
         const { data, error } = await supabase
           .from("transactions")
           .select()

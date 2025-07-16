@@ -4,26 +4,75 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login / Signup</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        background: #f0f2f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+
+      .card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        width: 300px;
+        text-align: center;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.6rem;
+        margin: 0.5rem 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      button {
+        width: 48%;
+        padding: 0.6rem;
+        margin-top: 0.8rem;
+        margin-right: 2%;
+        border: none;
+        border-radius: 4px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+      }
+
+      button:last-child {
+        margin-right: 0;
+        background-color: #28a745;
+      }
+
+      #status {
+        margin-top: 1rem;
+        color: red;
+        font-size: 0.9rem;
+      }
+    </style>
   </head>
   <body>
-    <h1>Transaction Tracker</h1>
-
-    <div>
+    <div class="card">
+      <h2>Login / Sign Up</h2>
       <input type="email" id="email" placeholder="Email" />
       <input type="password" id="password" placeholder="Password" />
-      <br /><br />
-      <button id="login">Log In</button>
-      <button id="signup">Sign Up</button>
+      <div>
+        <button id="login">Log In</button>
+        <button id="signup">Sign Up</button>
+      </div>
+      <p id="status"></p>
     </div>
-
-    <p id="status" style="color: red"></p>
 
     <script type="module">
       import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
-      const SUPABASE_URL = "https://keeumcpbteamhbnypuqa.supabase.co";
-      const SUPABASE_ANON_KEY =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZXVtY3BidGVhbWhibnlwdXFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI3MDU0NDYsImV4cCI6MjA2ODI4MTQ0Nn0.Ix1bgVR5D_2qgtDljJsP8N2-kpXmpZ-l-JRSJC3JG8s";
+      const SUPABASE_URL = "https://your-project-id.supabase.co";
+      const SUPABASE_ANON_KEY = "your-anon-key";
 
       const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
