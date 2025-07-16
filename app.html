@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Transaction Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f7fa;
+        padding: 40px;
+        max-width: 800px;
+        margin: auto;
+      }
+      h1,
+      h2 {
+        text-align: center;
+      }
+      form,
+      .transactions,
+      #monthSelectContainer {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #ccc;
+        margin-bottom: 30px;
+      }
+      input,
+      button,
+      select {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        font-size: 1em;
+      }
+      button {
+        cursor: pointer;
+      }
+      .category-group {
+        background: #eef6fb;
+        padding: 10px 15px;
+        margin-top: 10px;
+        border-left: 4px solid #0288d1;
+        border-radius: 6px;
+      }
+      .transaction {
+        padding-left: 10px;
+        margin-bottom: 4px;
+      }
+      #logoutBtn {
+        background: #f44336;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        font-weight: bold;
+        font-size: 1.1em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Transaction Tracker</h1>
+
+    <button id="logoutBtn">Log Out</button>
+
+    <form id="transactionForm">
+      <input
+        type="text"
+        id="location"
+        placeholder="Where was the purchase?"
+        required
+      />
+      <input
+        type="text"
+        id="category"
+        placeholder="Category (e.g. Groceries, Gas)"
+        required
+      />
+      <input
+        type="number"
+        id="amount"
+        placeholder="Amount ($)"
+        step="0.01"
+        min="0"
+        required
+      />
+      <input type="date" id="date" required />
+      <button type="submit">Add Transaction</button>
+    </form>
+
+    <div id="monthSelectContainer">
+      <label for="monthSelect"><strong>Select Month:</strong></label>
+      <select id="monthSelect">
+        <option value="">-- Select a month --</option>
+      </select>
+    </div>
+
+    <div class="transactions" id="transactionList"></div>
+
+    <script>
+      // TODO: Replace with your own Supabase URL and anon key
+      const SUPABASE_URL = "https://keeumcpbteamhbnypuqa.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZXVtY3BidGVhbWhibnlwdXFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI3MDU0NDYsImV4cCI6MjA2ODI4MTQ0Nn0.Ix1bgVR5D_2qgtDljJsP8N2-kpXmpZ-l-JRSJC3JG8s";
+
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const logoutBtn = document.getElementById("logoutBtn");
+      const form = document.getElementById("transactionForm");
+      const monthSelect = document.getElementById("monthSelect");
+      const transactionList = document.getElementById("transactionList");
+
+      let transactions = [];
+
+      async function checkAuth() {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (!session) {
+          window.location.href = "login.html";
+        } else {
+          await loadTransactions();
+        }
+      }
+
+      logoutBtn.addEventListener("click", async () => {
+        await supabase.auth.signOut();
+        window.location.href = "login.html";
+      });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const location = document.getElementById("location").value.trim();
+        const category = document.getElementById("category").value.trim();
+        const amount = parseFloat(document.getElementById("amount").value);
+        const date = document.getElementById("date").value;
+
+        if (!location || !category || isNaN(amount) || !date)
+          return alert("Please fill all fields correctly.");
+
+        const { data: user } = await supabase.auth.getUser();
+        if (!user) return alert("User not logged in.");
+
+        // Insert transaction linked to current user
+        const { error } = await supabase
+          .from("transactions")
+          .insert([{ location, category, amount, date, user_id: user.id }]);
+
+        if (error) {
+          alert("Error adding transaction: " + error.message);
+        } else {
+          form.reset();
+          await loadTransactions();
+        }
+      });
+
+      monthSelect.addEventListener("change", () => {
+        renderTransactions();
+      });
+
+      // Format YYYY-MM for month key
+      function formatMonthKey(dateStr) {
+        const d = new Date(dateStr);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+          2,
+          "0"
+        )}`;
+      }
+
+      function formatMonthYear(dateStr) {
+        const options = { year: "numeric", month: "long" };
+        const d = new Date(dateStr);
+        return d.toLocaleDateString(undefined, options);
+      }
+
+      async function loadTransactions() {
+        const { data: user } = await supabase.auth.getUser();
+        if (!user) return;
+
+        // Fetch all transactions for this user
+        const { data, error } = await supabase
+          .from("transactions")
+          .select()
+          .eq("user_id", user.id)
+          .order("date", { ascending: false });
+
+        if (error) {
+          alert("Error loading transactions: " + error.message);
+          return;
+        }
+
+        transactions = data || [];
+
+        populateMonthDropdown();
+        renderTransactions();
+      }
+
+      function populateMonthDropdown() {
+        const monthSet = new Set(
+          transactions.map((tx) => formatMonthKey(tx.date))
+        );
+        const sortedMonths = Array.from(monthSet).sort().reverse();
+
+        monthSelect.innerHTML =
+          '<option value="">-- Select a month --</option>';
+        sortedMonths.forEach((monthKey) => {
+          const option = document.createElement("option");
+          option.value = monthKey;
+          option.textContent = formatMonthYear(monthKey + "-01");
+          monthSelect.appendChild(option);
+        });
+
+        if (sortedMonths.length > 0) {
+          monthSelect.value = sortedMonths[0];
+        }
+      }
+
+      function renderTransactions() {
+        const selectedMonth = monthSelect.value;
+        transactionList.innerHTML = "";
+
+        if (!selectedMonth) {
+          transactionList.innerHTML =
+            '<p style="text-align:center;">Please select a month.</p>';
+          return;
+        }
+
+        const filtered = transactions.filter(
+          (tx) => formatMonthKey(tx.date) === selectedMonth
+        );
+
+        if (filtered.length === 0) {
+          transactionList.innerHTML =
+            '<p style="text-align:center;">No transactions for this month.</p>';
+          return;
+        }
+
+        const grouped = filtered.reduce((acc, tx) => {
+          if (!acc[tx.category]) acc[tx.category] = [];
+          acc[tx.category].push(tx);
+          return acc;
+        }, {});
+
+        for (const cat in grouped) {
+          const total = grouped[cat]
+            .reduce((sum, t) => sum + t.amount, 0)
+            .toFixed(2);
+
+          const catDiv = document.createElement("div");
+          catDiv.className = "category-group";
+          catDiv.innerHTML = `<h3>${cat} - Total: $${total}</h3>`;
+
+          grouped[cat].forEach((tx) => {
+            const txDiv = document.createElement("div");
+            txDiv.className = "transaction";
+            txDiv.textContent = `${tx.date}: ${
+              tx.location
+            } - $${tx.amount.toFixed(2)}`;
+            catDiv.appendChild(txDiv);
+          });
+
+          transactionList.appendChild(catDiv);
+        }
+      }
+
+      checkAuth();
+    </script>
+  </body>
+</html>

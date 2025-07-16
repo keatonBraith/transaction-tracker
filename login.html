@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Login - Transaction Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f7fa;
+        padding: 40px;
+        max-width: 400px;
+        margin: auto;
+      }
+      h1 {
+        text-align: center;
+      }
+      form {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #ccc;
+      }
+      input,
+      button {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        font-size: 1em;
+      }
+      #message {
+        color: red;
+        text-align: center;
+      }
+      .toggle {
+        text-align: center;
+        margin-top: 10px;
+        cursor: pointer;
+        color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Login / Sign Up</h1>
+
+    <form id="authForm">
+      <input type="email" id="email" placeholder="Email" required />
+      <input
+        type="password"
+        id="password"
+        placeholder="Password"
+        required
+        minlength="6"
+      />
+      <button type="submit" id="submitBtn">Log In</button>
+    </form>
+
+    <div class="toggle" id="toggleMode">Don't have an account? Sign Up</div>
+    <div id="message"></div>
+
+    <script>
+      // TODO: Replace with your own Supabase URL and anon key
+      const SUPABASE_URL = "https://keeumcpbteamhbnypuqa.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZXVtY3BidGVhbWhibnlwdXFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI3MDU0NDYsImV4cCI6MjA2ODI4MTQ0Nn0.Ix1bgVR5D_2qgtDljJsP8N2-kpXmpZ-l-JRSJC3JG8s";
+
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const form = document.getElementById("authForm");
+      const toggleMode = document.getElementById("toggleMode");
+      const submitBtn = document.getElementById("submitBtn");
+      const messageDiv = document.getElementById("message");
+
+      let isLogin = true;
+
+      toggleMode.addEventListener("click", () => {
+        isLogin = !isLogin;
+        submitBtn.textContent = isLogin ? "Log In" : "Sign Up";
+        toggleMode.textContent = isLogin
+          ? "Don't have an account? Sign Up"
+          : "Already have an account? Log In";
+        messageDiv.textContent = "";
+      });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        messageDiv.textContent = "";
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("password").value;
+
+        try {
+          let authResponse;
+          if (isLogin) {
+            authResponse = await supabase.auth.signInWithPassword({
+              email,
+              password,
+            });
+          } else {
+            authResponse = await supabase.auth.signUp({ email, password });
+          }
+
+          if (authResponse.error) {
+            messageDiv.textContent = authResponse.error.message;
+          } else {
+            if (!isLogin) {
+              messageDiv.style.color = "green";
+              messageDiv.textContent =
+                "Sign up successful! Please check your email to confirm.";
+            } else {
+              // Successful login — redirect to app.html
+              window.location.href = "app.html";
+            }
+          }
+        } catch (error) {
+          messageDiv.textContent = "Unexpected error: " + error.message;
+        }
+      });
+
+      // If user already logged in, redirect to app page
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          window.location.href = "app.html";
+        }
+      });
+    </script>
+  </body>
+</html>
