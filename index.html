@@ -71,14 +71,18 @@
     <script type="module">
       import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
-      const SUPABASE_URL = "https://your-project-id.supabase.co";
-      const SUPABASE_ANON_KEY = "your-anon-key";
+      const SUPABASE_URL = "https://your-project-id.supabase.co"; // Replace with your actual Supabase URL
+      const SUPABASE_ANON_KEY = "your-anon-key"; // Replace with your actual anon key
 
       const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+      const emailInput = document.getElementById("email");
+      const passwordInput = document.getElementById("password");
+      const status = document.getElementById("status");
+
       document.getElementById("login").addEventListener("click", async () => {
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
 
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -86,25 +90,32 @@
         });
 
         if (error) {
-          document.getElementById("status").textContent =
-            "Login failed: " + error.message;
+          status.textContent = "Login failed: " + error.message;
         } else {
           window.location.href = "app.html";
         }
       });
 
       document.getElementById("signup").addEventListener("click", async () => {
-        const email = document.getElementById("email").value;
-        const password = document.getElementById("password").value;
+        const email = emailInput.value.trim();
+        const password = passwordInput.value.trim();
 
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
 
         if (error) {
-          document.getElementById("status").textContent =
-            "Signup failed: " + error.message;
+          status.textContent = "Signup failed: " + error.message;
         } else {
-          document.getElementById("status").textContent =
-            "Signup successful! Check your email to confirm.";
+          status.style.color = "green";
+          status.textContent =
+            "Signup successful! Check your email to confirm your account.";
+
+          // Optional: auto-redirect after short delay (if email confirmation disabled)
+          setTimeout(() => {
+            window.location.href = "app.html";
+          }, 2000);
         }
       });
     </script>
