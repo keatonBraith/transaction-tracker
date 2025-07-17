@@ -245,11 +245,11 @@
         // Insert transaction to Supabase table "transactions"
         const { error } = await supabase.from("transactions").insert([
           {
-            user_id: user.id, // ✅ FK match with auth.users.id
-            category: selectedCategory,
-            amount: enteredAmount,
-            date: transactionDate,
-            location: purchaseLocation,
+            user_id: user.id,
+            category: category,
+            amount: amount,
+            date: date,
+            location: location,
           },
         ]);
 
