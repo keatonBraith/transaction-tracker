@@ -122,6 +122,55 @@
         color: #555;
         margin-top: 1rem;
       }
+
+      .transaction {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-left: 0.8rem;
+        margin-bottom: 0.3rem;
+        font-size: 0.95rem;
+      }
+
+      .transaction-details {
+        flex-grow: 1;
+      }
+
+      .transaction-actions button {
+        margin-left: 0.5rem;
+        padding: 0.3rem 0.6rem;
+        font-size: 0.85rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .transaction-actions button.edit {
+        background-color: #007bff;
+        color: white;
+      }
+
+      .transaction-actions button.delete {
+        background-color: #dc3545;
+        color: white;
+      }
+
+      .transaction-actions button.save {
+        background-color: #28a745;
+        color: white;
+      }
+
+      .transaction-actions button.cancel {
+        background-color: #6c757d;
+        color: white;
+      }
+
+      input.inline-edit {
+        font-size: 0.95rem;
+        padding: 0.1rem 0.3rem;
+        margin-right: 0.5rem;
+        width: auto;
+      }
     </style>
   </head>
 
@@ -368,14 +417,143 @@
           grouped[category].forEach((tx) => {
             const txDiv = document.createElement("div");
             txDiv.className = "transaction";
-            txDiv.textContent = `${tx.date}: ${
+            txDiv.dataset.txId = tx.id; // Save id for edit/delete
+
+            const detailsDiv = document.createElement("div");
+            detailsDiv.className = "transaction-details";
+            detailsDiv.textContent = `${tx.date}: ${
               tx.location
             } - $${tx.amount.toFixed(2)}`;
+
+            const actionsDiv = document.createElement("div");
+            actionsDiv.className = "transaction-actions";
+
+            const editBtn = document.createElement("button");
+            editBtn.className = "edit";
+            editBtn.textContent = "Edit";
+            editBtn.addEventListener("click", () =>
+              startEditTransaction(txDiv, tx)
+            );
+
+            const deleteBtn = document.createElement("button");
+            deleteBtn.className = "delete";
+            deleteBtn.textContent = "Delete";
+            deleteBtn.addEventListener("click", () => deleteTransaction(tx.id));
+
+            actionsDiv.appendChild(editBtn);
+            actionsDiv.appendChild(deleteBtn);
+
+            txDiv.appendChild(detailsDiv);
+            txDiv.appendChild(actionsDiv);
+
             catDiv.appendChild(txDiv);
           });
 
           transactionList.appendChild(catDiv);
         }
+      }
+
+      async function deleteTransaction(id) {
+        if (!confirm("Are you sure you want to delete this transaction?"))
+          return;
+
+        const { error } = await supabase
+          .from("transactions")
+          .delete()
+          .eq("id", id);
+        if (error) {
+          alert("Failed to delete: " + error.message);
+        } else {
+          // Remove from local array and re-render
+          transactions = transactions.filter((t) => t.id !== id);
+          renderTransactions();
+        }
+      }
+
+      function startEditTransaction(txDiv, tx) {
+        txDiv.innerHTML = ""; // Clear existing content
+
+        const detailsDiv = document.createElement("div");
+        detailsDiv.className = "transaction-details";
+
+        // Create inputs for editable fields
+        const dateInput = document.createElement("input");
+        dateInput.type = "date";
+        dateInput.className = "inline-edit";
+        dateInput.value = tx.date;
+
+        const locationInput = document.createElement("input");
+        locationInput.type = "text";
+        locationInput.className = "inline-edit";
+        locationInput.value = tx.location;
+
+        const amountInput = document.createElement("input");
+        amountInput.type = "number";
+        amountInput.step = "0.01";
+        amountInput.min = "0";
+        amountInput.className = "inline-edit";
+        amountInput.value = tx.amount;
+
+        detailsDiv.appendChild(dateInput);
+        detailsDiv.appendChild(locationInput);
+        detailsDiv.appendChild(amountInput);
+
+        const actionsDiv = document.createElement("div");
+        actionsDiv.className = "transaction-actions";
+
+        const saveBtn = document.createElement("button");
+        saveBtn.className = "save";
+        saveBtn.textContent = "Save";
+
+        const cancelBtn = document.createElement("button");
+        cancelBtn.className = "cancel";
+        cancelBtn.textContent = "Cancel";
+
+        actionsDiv.appendChild(saveBtn);
+        actionsDiv.appendChild(cancelBtn);
+
+        txDiv.appendChild(detailsDiv);
+        txDiv.appendChild(actionsDiv);
+
+        cancelBtn.addEventListener("click", () => {
+          renderTransactions();
+        });
+
+        saveBtn.addEventListener("click", async () => {
+          // Validate inputs
+          if (
+            !dateInput.value ||
+            !locationInput.value.trim() ||
+            isNaN(parseFloat(amountInput.value)) ||
+            parseFloat(amountInput.value) < 0
+          ) {
+            alert("Please fill out all fields correctly.");
+            return;
+          }
+
+          // Update in Supabase
+          const { error } = await supabase
+            .from("transactions")
+            .update({
+              date: dateInput.value,
+              location: locationInput.value.trim(),
+              amount: parseFloat(amountInput.value),
+            })
+            .eq("id", tx.id);
+
+          if (error) {
+            alert("Failed to update: " + error.message);
+          } else {
+            // Update local and re-render
+            const idx = transactions.findIndex((t) => t.id === tx.id);
+            if (idx !== -1) {
+              transactions[idx].date = dateInput.value;
+              transactions[idx].location = locationInput.value.trim();
+              transactions[idx].amount = parseFloat(amountInput.value);
+            }
+            renderTransactions();
+          }
+        });
       }
 
       // Initial load
