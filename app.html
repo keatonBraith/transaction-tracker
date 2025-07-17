@@ -234,22 +234,22 @@
 
         const {
           data: { user },
+          error: userError,
         } = await supabase.auth.getUser();
 
-        if (!user) {
-          alert("You are not logged in.");
-          window.location.href = "login.html";
+        if (userError) {
+          console.error("Failed to get user:", userError.message);
           return;
         }
 
         // Insert transaction to Supabase table "transactions"
         const { error } = await supabase.from("transactions").insert([
           {
-            location,
-            category,
-            amount,
-            date,
-            user_id: user.id,
+            user_id: user.id, // ✅ FK match with auth.users.id
+            category: selectedCategory,
+            amount: enteredAmount,
+            date: transactionDate,
+            location: purchaseLocation,
           },
         ]);
 
