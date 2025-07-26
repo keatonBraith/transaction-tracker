@@ -10,10 +10,6 @@
         margin: 0;
         padding: 0;
         background-color: #f8f9fa;
-        max-width: 900px;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 1rem;
       }
 
       #mainContainer {
@@ -24,14 +20,17 @@
 
       /* Navbar */
       .navbar {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        width: 100%;
         background-color: #007bff;
         color: white;
         padding: 1rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        position: relative;
-        border-radius: 6px;
+        border-radius: 0;
         margin-bottom: 1rem;
       }
 
@@ -121,22 +120,9 @@
         padding-left: 0.8rem;
         margin-bottom: 0.3rem;
         font-size: 0.95rem;
-      }
-
-      /* Center message */
-      .center-text {
-        text-align: center;
-        color: #555;
-        margin-top: 1rem;
-      }
-
-      .transaction {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-left: 0.8rem;
-        margin-bottom: 0.3rem;
-        font-size: 0.95rem;
       }
 
       .transaction-details {
@@ -214,17 +200,14 @@
   </head>
 
   <body>
-    <div id="mainContainer">
-      <div class="navbar">
-        <h1>Transaction Tracker</h1>
-        <button class="hamburger" id="menuBtn" aria-label="Menu">
-          &#9776;
-        </button>
-        <div class="dropdown" id="dropdownMenu">
-          <button id="logoutBtn">Logout</button>
-        </div>
+    <div class="navbar">
+      <h1>Transaction Tracker</h1>
+      <button class="hamburger" id="menuBtn" aria-label="Menu">&#9776;</button>
+      <div class="dropdown" id="dropdownMenu">
+        <button id="logoutBtn">Logout</button>
       </div>
-
+    </div>
+    <div id="mainContainer">
       <form id="transactionForm">
         <input
           type="text"
