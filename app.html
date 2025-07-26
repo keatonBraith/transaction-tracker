@@ -2,222 +2,113 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Transaction Tracker</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transaction Tracker</title>
     <style>
       body {
-        font-family: Arial, sans-serif;
+        font-family: sans-serif;
         margin: 0;
-        background-color: #f8f9fa;
-        max-width: 900px;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 1rem;
+        background-color: #f7f9fc;
       }
 
-      /* Navbar */
-      .navbar {
+      header {
         background-color: #007bff;
         color: white;
         padding: 1rem;
+        text-align: center;
+      }
+
+      main {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-group {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: relative;
-        border-radius: 6px;
+        gap: 1rem;
         margin-bottom: 1rem;
       }
 
-      .navbar h1 {
-        margin: 0;
-        font-size: 1.5rem;
-      }
-
-      .hamburger {
-        font-size: 1.8rem;
-        cursor: pointer;
-        background: none;
-        border: none;
-        color: white;
-      }
-
-      .dropdown {
-        display: none;
-        position: absolute;
-        top: 60px;
-        right: 10px;
-        background: white;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        z-index: 10;
-        min-width: 120px;
-      }
-
-      .dropdown button {
-        width: 100%;
-        padding: 0.6rem 1rem;
-        background: none;
-        border: none;
-        text-align: left;
-        cursor: pointer;
-        font-size: 1rem;
-      }
-
-      .dropdown button:hover {
-        background-color: #f0f0f0;
-      }
-
-      /* Form and UI */
-      form,
-      #monthSelectContainer,
-      .transactions {
-        background: white;
-        padding: 1rem 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 0 10px #ccc;
-        margin-bottom: 1.5rem;
-      }
-
-      form input,
-      form select,
-      form button {
-        width: 100%;
+      input,
+      select,
+      button {
         padding: 0.6rem;
-        margin: 0.6rem 0;
-        font-size: 1rem;
-        border: 1px solid #ccc;
         border-radius: 4px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
       }
 
-      form button {
-        background-color: #007bff;
+      button {
+        background-color: #28a745;
         color: white;
         border: none;
         cursor: pointer;
-        font-weight: bold;
       }
 
-      form button:hover {
-        background-color: #0056b3;
+      button.delete {
+        background-color: #dc3545;
       }
 
-      .category-group {
-        background: #eef6fb;
-        padding: 0.8rem 1rem;
-        margin-top: 1rem;
-        border-left: 4px solid #0288d1;
-        border-radius: 6px;
+      button.edit {
+        background-color: #ffc107;
       }
 
-      .transaction {
-        padding-left: 0.8rem;
-        margin-bottom: 0.3rem;
-        font-size: 0.95rem;
+      button.save {
+        background-color: #007bff;
       }
 
-      /* Center message */
-      .center-text {
-        text-align: center;
-        color: #555;
-        margin-top: 1rem;
+      button.cancel {
+        background-color: gray;
       }
 
       .transaction {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-left: 0.8rem;
-        margin-bottom: 0.3rem;
-        font-size: 0.95rem;
+        padding: 0.5rem;
+        border-bottom: 1px solid #eee;
       }
 
       .transaction-details {
-        flex-grow: 1;
+        display: flex;
+        gap: 1rem;
       }
 
-      .transaction-actions button {
-        margin-left: 0.5rem;
-        padding: 0.3rem 0.6rem;
-        font-size: 0.85rem;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
+      .transaction-actions {
+        display: flex;
+        gap: 0.5rem;
       }
 
-      .transaction-actions button.edit {
-        background-color: #007bff;
-        color: white;
-      }
-
-      .transaction-actions button.delete {
-        background-color: #dc3545;
-        color: white;
-      }
-
-      .transaction-actions button.save {
-        background-color: #28a745;
-        color: white;
-      }
-
-      .transaction-actions button.cancel {
-        background-color: #6c757d;
-        color: white;
-      }
-
-      input.inline-edit {
-        font-size: 0.95rem;
-        padding: 0.1rem 0.3rem;
-        margin-right: 0.5rem;
-        width: auto;
+      .inline-edit {
+        padding: 0.3rem;
+        font-size: 0.9rem;
+        width: 100px;
       }
     </style>
   </head>
-
   <body>
-    <div class="navbar">
+    <header>
       <h1>Transaction Tracker</h1>
-      <button class="hamburger" id="menuBtn" aria-label="Menu">&#9776;</button>
-      <div class="dropdown" id="dropdownMenu">
-        <button id="logoutBtn">Logout</button>
+    </header>
+    <main>
+      <div class="form-group">
+        <input type="date" id="tx-date" />
+        <input type="text" id="tx-location" placeholder="Location" />
+        <input type="number" id="tx-amount" placeholder="Amount" min="0" />
+        <button id="add-transaction">Add</button>
       </div>
-    </div>
 
-    <form id="transactionForm">
-      <input
-        type="text"
-        id="location"
-        placeholder="Where was the purchase?"
-        required
-        autocomplete="off"
-      />
-      <input
-        type="text"
-        id="category"
-        placeholder="Category (e.g., Groceries, Gas)"
-        required
-        autocomplete="off"
-      />
-      <input
-        type="number"
-        id="amount"
-        placeholder="Amount ($)"
-        step="0.01"
-        min="0"
-        required
-      />
-      <input type="date" id="date" required />
-      <button type="submit">Add Transaction</button>
-    </form>
+      <div class="form-group">
+        <label for="monthSelect">Filter by Month:</label>
+        <select id="monthSelect"></select>
+      </div>
 
-    <div id="monthSelectContainer">
-      <label for="monthSelect"><strong>Select Month:</strong></label>
-      <select id="monthSelect">
-        <option value="">-- Select a month --</option>
-      </select>
-    </div>
-
-    <div class="transactions" id="transactionList"></div>
+      <div id="transaction-list"></div>
+    </main>
 
     <script type="module">
       import { createClient } from "https://esm.sh/@supabase/supabase-js";
@@ -226,266 +117,153 @@
       const SUPABASE_ANON_KEY =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZXVtY3BidGVhbWhibnlwdXFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI3MDU0NDYsImV4cCI6MjA2ODI4MTQ0Nn0.Ix1bgVR5D_2qgtDljJsP8N2-kpXmpZ-l-JRSJC3JG8s";
 
-      const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-      // Hamburger menu toggle
-      const menuBtn = document.getElementById("menuBtn");
-      const dropdownMenu = document.getElementById("dropdownMenu");
-
-      menuBtn.addEventListener("click", () => {
-        dropdownMenu.style.display =
-          dropdownMenu.style.display === "block" ? "none" : "block";
-      });
-
-      window.addEventListener("click", (e) => {
-        if (!menuBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
-          dropdownMenu.style.display = "none";
-        }
-      });
-
-      // Logout
-      const logoutBtn = document.getElementById("logoutBtn");
-      logoutBtn.addEventListener("click", async () => {
-        await supabase.auth.signOut();
-        window.location.href = "login.html";
-      });
-
-      // Check auth session, redirect if no session
-      async function checkAuth() {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        if (!session) {
-          window.location.href = "login.html";
-        }
-      }
-
-      checkAuth();
-
-      const form = document.getElementById("transactionForm");
-      const monthSelect = document.getElementById("monthSelect");
-      const transactionList = document.getElementById("transactionList");
-
+      let user = null;
       let transactions = [];
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-
-        const location = document.getElementById("location").value.trim();
-        const category = document.getElementById("category").value.trim();
-        const amount = parseFloat(document.getElementById("amount").value);
-        const date = document.getElementById("date").value;
-
-        if (!location || !category || isNaN(amount) || !date) {
-          alert("Please fill out all fields correctly.");
+      async function init() {
+        const { data, error } = await supabase.auth.getUser();
+        if (error || !data.user) {
+          window.location.href = "index.html";
           return;
         }
 
-        const {
-          data: { user },
-          error: userError,
-        } = await supabase.auth.getUser();
-
-        if (userError) {
-          console.error("Failed to get user:", userError.message);
-          return;
-        }
-
-        // Insert transaction to Supabase table "transactions"
-        const { error } = await supabase.from("transactions").insert([
-          {
-            user_id: user.id,
-            category: category,
-            amount: amount,
-            date: date,
-            location: location,
-          },
-        ]);
-
-        if (error) {
-          alert("Error adding transaction: " + error.message);
-        } else {
-          form.reset();
-          await loadTransactions();
-        }
-      });
-
-      monthSelect.addEventListener("change", () => {
-        renderTransactions();
-      });
-
-      // Format YYYY-MM for month key
-      function formatMonthKey(dateStr) {
-        return dateStr.slice(0, 7); // "YYYY-MM"
-      }
-
-      // Format month nicely, e.g. "January 2025"
-      function formatMonthYear(dateStr) {
-        const options = { year: "numeric", month: "long" };
-        const d = new Date(dateStr);
-        return d.toLocaleDateString(undefined, options);
-      }
-
-      async function loadTransactions() {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
-          window.location.href = "login.html";
-          return;
-        }
-
-        // Fetch transactions for this user
-        const { data, error } = await supabase
-          .from("transactions")
-          .select()
-          .eq("user_id", user.id)
-          .order("date", { ascending: false });
-
-        if (error) {
-          alert("Error loading transactions: " + error.message);
-          return;
-        }
-
-        transactions = data || [];
-
+        user = data.user;
+        await fetchTransactions();
         populateMonthDropdown();
         renderTransactions();
       }
 
+      async function fetchTransactions() {
+        const { data, error } = await supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("date", { ascending: false });
+
+        if (error) {
+          alert("Failed to fetch transactions");
+          return;
+        }
+
+        transactions = data;
+      }
+
+      function formatMonthKey(dateStr) {
+        const d = new Date(dateStr);
+        return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(
+          2,
+          "0"
+        )}`;
+      }
+
       function populateMonthDropdown() {
-        const monthSelect = document.getElementById("monthFilter");
-        const uniqueMonths = Array.from(
-          new Set(transactions.map((tx) => formatMonthKey(tx.date)))
+        const monthSelect = document.getElementById("monthSelect");
+        const months = Array.from(
+          new Set(transactions.map((t) => formatMonthKey(t.date)))
         )
           .sort()
           .reverse();
 
-        const current = monthSelect.value;
-
-        monthSelect.innerHTML = "";
-        uniqueMonths.forEach((month) => {
-          const option = document.createElement("option");
-          option.value = month;
-          option.textContent = month;
-          monthSelect.appendChild(option);
-        });
-
-        // Reset selected month if current no longer exists
-        if (uniqueMonths.includes(current)) {
-          monthSelect.value = current;
-        } else if (uniqueMonths.length > 0) {
-          monthSelect.value = uniqueMonths[0];
-        }
-
-        renderTransactions();
+        monthSelect.innerHTML = months
+          .map((m) => `<option value="${m}">${m}</option>`)
+          .join("");
       }
 
       function renderTransactions() {
-        const selectedMonth = monthSelect.value;
-        transactionList.innerHTML = "";
-
-        if (!selectedMonth) {
-          transactionList.innerHTML =
-            '<p class="center-text">Please select a month to see transactions.</p>';
-          return;
-        }
+        const list = document.getElementById("transaction-list");
+        const selectedMonth = document.getElementById("monthSelect").value;
+        list.innerHTML = "";
 
         const filtered = transactions.filter(
-          (tx) => formatMonthKey(tx.date) === selectedMonth
+          (t) => formatMonthKey(t.date) === selectedMonth
         );
 
-        if (filtered.length === 0) {
-          transactionList.innerHTML =
-            '<p class="center-text">No transactions for this month.</p>';
-          return;
-        }
+        filtered.forEach((tx) => {
+          const txDiv = document.createElement("div");
+          txDiv.className = "transaction";
 
-        // Group by category
-        const grouped = filtered.reduce((acc, tx) => {
-          if (!acc[tx.category]) acc[tx.category] = [];
-          acc[tx.category].push(tx);
-          return acc;
-        }, {});
+          const detailsDiv = document.createElement("div");
+          detailsDiv.className = "transaction-details";
+          detailsDiv.textContent = `${tx.date} — ${
+            tx.location
+          } — $${tx.amount.toFixed(2)}`;
 
-        for (const category in grouped) {
-          const total = grouped[category]
-            .reduce((sum, tx) => sum + tx.amount, 0)
-            .toFixed(2);
+          const actionsDiv = document.createElement("div");
+          actionsDiv.className = "transaction-actions";
 
-          const catDiv = document.createElement("div");
-          catDiv.className = "category-group";
-          catDiv.innerHTML = `<h3>${category} - Total: $${total}</h3>`;
+          const editBtn = document.createElement("button");
+          editBtn.className = "edit";
+          editBtn.textContent = "Edit";
+          editBtn.addEventListener("click", () =>
+            startEditTransaction(txDiv, tx)
+          );
 
-          grouped[category].forEach((tx) => {
-            const txDiv = document.createElement("div");
-            txDiv.className = "transaction";
-            txDiv.dataset.txId = tx.id; // Save id for edit/delete
+          const deleteBtn = document.createElement("button");
+          deleteBtn.className = "delete";
+          deleteBtn.textContent = "Delete";
+          deleteBtn.addEventListener("click", () => deleteTransaction(tx.id));
 
-            const detailsDiv = document.createElement("div");
-            detailsDiv.className = "transaction-details";
-            detailsDiv.textContent = `${tx.date}: ${
-              tx.location
-            } - $${tx.amount.toFixed(2)}`;
+          actionsDiv.appendChild(editBtn);
+          actionsDiv.appendChild(deleteBtn);
 
-            const actionsDiv = document.createElement("div");
-            actionsDiv.className = "transaction-actions";
-
-            const editBtn = document.createElement("button");
-            editBtn.className = "edit";
-            editBtn.textContent = "Edit";
-            editBtn.addEventListener("click", () =>
-              startEditTransaction(txDiv, tx)
-            );
-
-            const deleteBtn = document.createElement("button");
-            deleteBtn.className = "delete";
-            deleteBtn.textContent = "Delete";
-            deleteBtn.addEventListener("click", () => deleteTransaction(tx.id));
-
-            actionsDiv.appendChild(editBtn);
-            actionsDiv.appendChild(deleteBtn);
-
-            txDiv.appendChild(detailsDiv);
-            txDiv.appendChild(actionsDiv);
-
-            catDiv.appendChild(txDiv);
-          });
-
-          transactionList.appendChild(catDiv);
-        }
+          txDiv.appendChild(detailsDiv);
+          txDiv.appendChild(actionsDiv);
+          list.appendChild(txDiv);
+        });
       }
 
-      async function deleteTransaction(tx) {
-        // 1. Delete from Supabase
+      document
+        .getElementById("add-transaction")
+        .addEventListener("click", async () => {
+          const date = document.getElementById("tx-date").value;
+          const location = document.getElementById("tx-location").value.trim();
+          const amount = parseFloat(document.getElementById("tx-amount").value);
+
+          if (!date || !location || isNaN(amount)) {
+            alert("Please fill out all fields correctly.");
+            return;
+          }
+
+          const { data, error } = await supabase.from("transactions").insert([
+            {
+              date,
+              location,
+              amount,
+              user_id: user.id,
+            },
+          ]);
+
+          if (error) {
+            alert("Error adding transaction: " + error.message);
+          } else {
+            await fetchTransactions();
+            populateMonthDropdown();
+            renderTransactions();
+          }
+        });
+
+      async function deleteTransaction(id) {
         const { error } = await supabase
           .from("transactions")
           .delete()
-          .eq("id", tx.id);
+          .eq("id", id);
 
         if (error) {
           alert("Failed to delete: " + error.message);
           return;
         }
 
-        // 2. Remove from local array
-        transactions = transactions.filter((t) => t.id !== tx.id);
-
-        // 3. Re-render transaction list
+        transactions = transactions.filter((t) => t.id !== id);
         renderTransactions();
-
-        // 4. Update month dropdown
         populateMonthDropdown();
       }
 
       function startEditTransaction(txDiv, tx) {
-        txDiv.innerHTML = ""; // Clear existing content
+        txDiv.innerHTML = "";
 
         const detailsDiv = document.createElement("div");
         detailsDiv.className = "transaction-details";
 
-        // Create inputs for editable fields
         const dateInput = document.createElement("input");
         dateInput.type = "date";
         dateInput.className = "inline-edit";
@@ -524,12 +302,9 @@
         txDiv.appendChild(detailsDiv);
         txDiv.appendChild(actionsDiv);
 
-        cancelBtn.addEventListener("click", () => {
-          renderTransactions();
-        });
+        cancelBtn.addEventListener("click", renderTransactions);
 
         saveBtn.addEventListener("click", async () => {
-          // Validate inputs
           if (
             !dateInput.value ||
             !locationInput.value.trim() ||
@@ -540,7 +315,6 @@
             return;
           }
 
-          // Update in Supabase
           const { error } = await supabase
             .from("transactions")
             .update({
@@ -548,25 +322,24 @@
               location: locationInput.value.trim(),
               amount: parseFloat(amountInput.value),
             })
-            .eq("id", tx.id);
+            .eq("id", tx.id)
+            .eq("user_id", user.id);
 
           if (error) {
             alert("Failed to update: " + error.message);
           } else {
-            // Update local and re-render
-            const idx = transactions.findIndex((t) => t.id === tx.id);
-            if (idx !== -1) {
-              transactions[idx].date = dateInput.value;
-              transactions[idx].location = locationInput.value.trim();
-              transactions[idx].amount = parseFloat(amountInput.value);
-            }
+            await fetchTransactions();
+            populateMonthDropdown();
             renderTransactions();
           }
         });
       }
 
-      // Initial load
-      loadTransactions();
+      document
+        .getElementById("monthSelect")
+        .addEventListener("change", renderTransactions);
+
+      init();
     </script>
   </body>
 </html>
