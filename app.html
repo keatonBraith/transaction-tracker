@@ -504,25 +504,10 @@
         amountInput.className = "inline-edit";
         amountInput.value = tx.amount;
 
-        const categorySelect = document.createElement("select");
-        categorySelect.className = "inline-edit";
-        const categories = [
-          "Food",
-          "Transport",
-          "Shopping",
-          "Bills",
-          "Entertainment",
-          "Other",
-        ];
-        categories.forEach((cat) => {
-          const option = document.createElement("option");
-          option.value = cat;
-          option.textContent = cat;
-          if (cat === tx.category) {
-            option.selected = true;
-          }
-          categorySelect.appendChild(option);
-        });
+        const categoryInput = document.createElement("select");
+        categoryInput.type = "text";
+        categoryInput.className = "inline-edit";
+        categoryInput.value = tx.location;
 
         detailsDiv.appendChild(dateInput);
         detailsDiv.appendChild(locationInput);
@@ -569,7 +554,7 @@
               date: dateInput.value,
               location: locationInput.value.trim(),
               amount: parseFloat(amountInput.value),
-              category: categorySelect.value, // ✅ Added category
+              category: categoryInput.value, // ✅ Added category
             })
             .eq("id", tx.id);
 
@@ -582,7 +567,7 @@
               transactions[idx].date = dateInput.value;
               transactions[idx].location = locationInput.value.trim();
               transactions[idx].amount = parseFloat(amountInput.value);
-              transactions[idx].category = categorySelect.value;
+              transactions[idx].category = categoryInput.value;
             }
             renderTransactions();
           }
