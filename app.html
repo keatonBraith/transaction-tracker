@@ -207,6 +207,7 @@
       <button class="hamburger" id="menuBtn" aria-label="Menu">&#9776;</button>
       <div class="dropdown" id="dropdownMenu">
         <button id="logoutBtn">Logout</button>
+        <button onclick="promptPasswordReset()">Reset Password</button>
       </div>
     </div>
     <div id="mainContainer">
@@ -758,6 +759,23 @@
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+      }
+
+      async function promptPasswordReset() {
+        const email = prompt(
+          "Enter your email address to reset your password:"
+        );
+        if (!email) return;
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + "/reset-password.html",
+        });
+
+        if (error) {
+          alert("Error sending password reset email: " + error.message);
+        } else {
+          alert("Password reset email sent! Please check your inbox.");
+        }
       }
 
       // Initial load
