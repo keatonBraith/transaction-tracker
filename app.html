@@ -504,15 +504,35 @@
         amountInput.className = "inline-edit";
         amountInput.value = tx.amount;
 
-        const categoryInput = document.createElement("select");
+        const categoryInput = document.createElement("input");
         categoryInput.type = "text";
         categoryInput.className = "inline-edit";
-        categoryInput.value = tx.location;
+        categoryInput.placeholder = "e.g. Groceries";
+        categoryInput.value = tx.category || "";
 
+        // Autocomplete datalist for recent categories
+        const categoryListId = "category-suggestions";
+        categoryInput.setAttribute("list", categoryListId);
+
+        const datalist = document.createElement("datalist");
+        datalist.id = categoryListId;
+
+        const uniqueCategories = [
+          ...new Set(transactions.map((t) => t.category).filter(Boolean)),
+        ].sort();
+
+        uniqueCategories.forEach((cat) => {
+          const option = document.createElement("option");
+          option.value = cat;
+          datalist.appendChild(option);
+        });
+
+        // Append all inputs
         detailsDiv.appendChild(dateInput);
         detailsDiv.appendChild(locationInput);
         detailsDiv.appendChild(amountInput);
-        detailsDiv.appendChild(categorySelect);
+        detailsDiv.appendChild(categoryInput);
+        detailsDiv.appendChild(datalist); // append datalist to make autocomplete work
 
         const actionsDiv = document.createElement("div");
         actionsDiv.className = "transaction-actions";
@@ -536,7 +556,6 @@
         });
 
         saveBtn.addEventListener("click", async () => {
-          // Validate inputs
           if (
             !dateInput.value ||
             !locationInput.value.trim() ||
@@ -547,27 +566,35 @@
             return;
           }
 
-          // Update in Supabase
+          // Capitalize each word in category
+          const formatCategory = (text) =>
+            text
+              .trim()
+              .toLowerCase()
+              .replace(/\b\w/g, (char) => char.toUpperCase());
+
+          const formattedCategory = formatCategory(categoryInput.value);
+
           const { error } = await supabase
             .from("transactions")
             .update({
               date: dateInput.value,
               location: locationInput.value.trim(),
               amount: parseFloat(amountInput.value),
-              category: categoryInput.value, // ✅ Added category
+              category: formattedCategory,
             })
             .eq("id", tx.id);
 
           if (error) {
             alert("Failed to update: " + error.message);
           } else {
-            // Update local and re-render
+            // Update local cache
             const idx = transactions.findIndex((t) => t.id === tx.id);
             if (idx !== -1) {
               transactions[idx].date = dateInput.value;
               transactions[idx].location = locationInput.value.trim();
               transactions[idx].amount = parseFloat(amountInput.value);
-              transactions[idx].category = categoryInput.value;
+              transactions[idx].category = formattedCategory;
             }
             renderTransactions();
           }
