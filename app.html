@@ -355,23 +355,31 @@
       }
 
       function populateMonthDropdown() {
-        const monthsSet = new Set(
-          transactions.map((tx) => formatMonthKey(tx.date))
-        );
-        const monthsSorted = Array.from(monthsSet).sort().reverse();
+        const monthSelect = document.getElementById("monthFilter");
+        const uniqueMonths = Array.from(
+          new Set(transactions.map((tx) => formatMonthKey(tx.date)))
+        )
+          .sort()
+          .reverse();
 
-        monthSelect.innerHTML =
-          '<option value="">-- Select a month --</option>';
-        monthsSorted.forEach((month) => {
+        const current = monthSelect.value;
+
+        monthSelect.innerHTML = "";
+        uniqueMonths.forEach((month) => {
           const option = document.createElement("option");
           option.value = month;
-          option.textContent = formatMonthYear(month + "-01");
+          option.textContent = month;
           monthSelect.appendChild(option);
         });
 
-        if (monthsSorted.length > 0) {
-          monthSelect.value = monthsSorted[0];
+        // Reset selected month if current no longer exists
+        if (uniqueMonths.includes(current)) {
+          monthSelect.value = current;
+        } else if (uniqueMonths.length > 0) {
+          monthSelect.value = uniqueMonths[0];
         }
+
+        renderTransactions();
       }
 
       function renderTransactions() {
@@ -449,21 +457,26 @@
         }
       }
 
-      async function deleteTransaction(id) {
-        if (!confirm("Are you sure you want to delete this transaction?"))
-          return;
-
+      async function deleteTransaction(tx) {
+        // 1. Delete from Supabase
         const { error } = await supabase
           .from("transactions")
           .delete()
-          .eq("id", id);
+          .eq("id", tx.id);
+
         if (error) {
           alert("Failed to delete: " + error.message);
-        } else {
-          // Remove from local array and re-render
-          transactions = transactions.filter((t) => t.id !== id);
-          renderTransactions();
+          return;
         }
+
+        // 2. Remove from local array
+        transactions = transactions.filter((t) => t.id !== tx.id);
+
+        // 3. Re-render transaction list
+        renderTransactions();
+
+        // 4. Update month dropdown
+        populateMonthDropdown();
       }
 
       function startEditTransaction(txDiv, tx) {
