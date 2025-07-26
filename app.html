@@ -339,7 +339,7 @@
       // Format month nicely, e.g. "January 2025"
       function formatMonthYear(dateStr) {
         const options = { year: "numeric", month: "long" };
-        const d = new Date(dateStr);
+        const d = new Date(dateStr + "T12:00:00");
         return d.toLocaleDateString(undefined, options);
       }
 
@@ -379,10 +379,11 @@
 
         monthSelect.innerHTML =
           '<option value="">-- Select a month --</option>';
+
         monthsSorted.forEach((month) => {
           const option = document.createElement("option");
           option.value = month;
-          option.textContent = formatMonthYear(month + "-01");
+          option.textContent = formatMonthYear(month + "-01"); // Add noon time safety
           monthSelect.appendChild(option);
         });
 
