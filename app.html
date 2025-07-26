@@ -172,6 +172,8 @@
         width: auto;
       }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
 
   <body>
@@ -236,6 +238,8 @@
 
     <div class="transactions" id="transactionList"></div>
 
+    <canvas id="categoryChart" width="400" height="400"></canvas>
+
     <script type="module">
       import { createClient } from "https://esm.sh/@supabase/supabase-js";
 
@@ -244,6 +248,7 @@
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtlZXVtY3BidGVhbWhibnlwdXFhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI3MDU0NDYsImV4cCI6MjA2ODI4MTQ0Nn0.Ix1bgVR5D_2qgtDljJsP8N2-kpXmpZ-l-JRSJC3JG8s";
 
       const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      let categoryChart = null;
 
       // Hamburger menu toggle
       const menuBtn = document.getElementById("menuBtn");
@@ -402,9 +407,11 @@
           return;
         }
 
-        const filtered = transactions.filter(
-          (tx) => formatMonthKey(tx.date) === selectedMonth
+        const filtered = transactions.filter((tx) =>
+          tx.date.startsWith(monthSelect.value)
         );
+
+        renderCategoryChart(filtered); // <-- Add this here
 
         if (filtered.length === 0) {
           transactionList.innerHTML =
@@ -465,6 +472,60 @@
 
           transactionList.appendChild(catDiv);
         }
+      }
+
+      function renderCategoryChart(transactionsForMonth) {
+        const categoryTotals = {};
+
+        transactionsForMonth.forEach((tx) => {
+          const category = tx.category?.trim() || "Uncategorized";
+          categoryTotals[category] =
+            (categoryTotals[category] || 0) + tx.amount;
+        });
+
+        const data = {
+          labels: Object.keys(categoryTotals),
+          datasets: [
+            {
+              data: Object.values(categoryTotals),
+              backgroundColor: [
+                "#FF6384",
+                "#36A2EB",
+                "#FFCE56",
+                "#4BC0C0",
+                "#9966FF",
+                "#FF9F40",
+                "#E7E9ED",
+                "#66BB6A",
+              ],
+            },
+          ],
+        };
+
+        const config = {
+          type: "pie",
+          data: data,
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                position: "bottom",
+              },
+              title: {
+                display: true,
+                text: "Spending by Category",
+              },
+            },
+          },
+        };
+
+        // Destroy old chart if exists
+        if (categoryChart) {
+          categoryChart.destroy();
+        }
+
+        const ctx = document.getElementById("categoryChart").getContext("2d");
+        categoryChart = new Chart(ctx, config);
       }
 
       async function deleteTransaction(id) {
