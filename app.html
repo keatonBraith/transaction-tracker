@@ -179,13 +179,18 @@
         flex-wrap: wrap;
       }
 
-      /* Each section flexes to fill space, stacks at 400px width */
       #transactionsSection,
       #chartSection {
         flex: 1 1 400px;
       }
 
-      /* Stack vertically on mobile */
+      /* Make the chart responsive */
+      #categoryChart {
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* Stack vertically on smaller screens */
       @media (max-width: 768px) {
         #contentContainer {
           flex-direction: column;
@@ -261,9 +266,14 @@
       </button>
     </div>
 
-    <div class="transactions" id="transactionList"></div>
-
-    <canvas id="categoryChart" width="400" height="400"></canvas>
+    <div id="contentContainer">
+      <div id="transactionsSection">
+        <div id="transactionList"></div>
+      </div>
+      <div id="chartSection">
+        <canvas id="categoryChart" width="400" height="400"></canvas>
+      </div>
+    </div>
 
     <script type="module">
       import { createClient } from "https://esm.sh/@supabase/supabase-js";
