@@ -171,6 +171,31 @@
         margin-right: 0.5rem;
         width: auto;
       }
+
+      #contentContainer {
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      /* Each section flexes to fill space, stacks at 400px width */
+      #transactionsSection,
+      #chartSection {
+        flex: 1 1 400px;
+      }
+
+      /* Stack vertically on mobile */
+      @media (max-width: 768px) {
+        #contentContainer {
+          flex-direction: column;
+        }
+
+        #chartSection {
+          display: flex;
+          justify-content: center;
+        }
+      }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
