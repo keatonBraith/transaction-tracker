@@ -217,6 +217,23 @@
       </select>
     </div>
 
+    <div style="text-align: right; margin-bottom: 1rem">
+      <button
+        id="exportBtn"
+        style="
+          background-color: #28a745;
+          color: white;
+          padding: 0.5rem 1rem;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+          font-weight: bold;
+        "
+      >
+        Export CSV
+      </button>
+    </div>
+
     <div class="transactions" id="transactionList"></div>
 
     <script type="module">
@@ -601,8 +618,60 @@
         });
       }
 
+      function exportCSV() {
+        // Get selected month
+        const selectedMonth = monthSelect.value;
+
+        // Filter transactions by month
+        const filtered = transactions.filter(
+          (tx) => formatMonthKey(tx.date) === selectedMonth
+        );
+
+        if (filtered.length === 0) {
+          alert("No transactions for the selected month.");
+          return;
+        }
+
+        // Define CSV header
+        const header = ["Date", "Location", "Amount", "Category"];
+        const rows = [header];
+
+        // Add rows
+        filtered.forEach((tx) => {
+          rows.push([
+            tx.date,
+            tx.location,
+            tx.amount.toFixed(2),
+            tx.category || "",
+          ]);
+        });
+
+        // Convert to CSV string
+        const csvContent = rows
+          .map((row) => row.map((val) => `"${val}"`).join(","))
+          .join("\n");
+
+        // Create blob and trigger download
+        const blob = new Blob([csvContent], {
+          type: "text/csv;charset=utf-8;",
+        });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `transactions-${selectedMonth}.csv`;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
       // Initial load
       loadTransactions();
+
+      // Add event listener for export button
+      document.getElementById("exportBtn").addEventListener("click", exportCSV);
     </script>
   </body>
 </html>
