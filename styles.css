@@ -77,18 +77,27 @@ form,
   margin-bottom: 1.5rem;
 }
 
+/* Ensures all form elements are sized consistently */
 form input,
 form select,
 form button {
-  box-sizing: border-box; /* includes padding and border in width */
+  box-sizing: border-box;
   width: 100%;
   padding: 0.6rem;
   margin: 0.6rem 0;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
-  /* add this line to vertically align */
-  vertical-align: middle;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Override browser quirks in special input types */
+input[type="date"],
+input[type="number"] {
+  padding-right: 0.6rem; /* reduce default calendar/spinner width */
+  min-height: 2.5rem; /* force consistent height with select/button */
 }
 
 /* Optional: set a consistent font-family to inputs and selects */
