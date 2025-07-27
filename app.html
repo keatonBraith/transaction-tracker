@@ -207,7 +207,7 @@
       <button class="hamburger" id="menuBtn" aria-label="Menu">&#9776;</button>
       <div class="dropdown" id="dropdownMenu">
         <button id="logoutBtn">Logout</button>
-        <button onclick="promptPasswordReset()">Reset Password</button>
+        <button id="resetPasswordBtn">Reset Password</button>
       </div>
     </div>
     <div id="mainContainer">
@@ -761,7 +761,8 @@
         URL.revokeObjectURL(url);
       }
 
-      async function promptPasswordReset() {
+      const btn = document.getElementById("resetPasswordBtn");
+      btn.addEventListener("click", async () => {
         const email = prompt(
           "Enter your email address to reset your password:"
         );
@@ -777,7 +778,7 @@
         } else {
           alert("Password reset email sent! Please check your inbox.");
         }
-      }
+      });
 
       // Initial load
       loadTransactions();
