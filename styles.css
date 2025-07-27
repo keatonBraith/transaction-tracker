@@ -1,0 +1,186 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  overflow-y: scroll;
+}
+
+#mainContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  padding: 1rem 1.5rem 1rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.navbar h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.hamburger {
+  font-size: 1.8rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  color: white;
+  margin-right: 1.5rem;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  top: 60px;
+  right: 10px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  min-width: 120px;
+}
+
+.dropdown button {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.dropdown button:hover {
+  background-color: #f0f0f0;
+}
+
+form,
+#monthSelectContainer,
+.transactions {
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #ccc;
+  margin-bottom: 1.5rem;
+}
+
+form input,
+form select,
+form button {
+  width: 100%;
+  padding: 0.6rem;
+  margin: 0.6rem 0;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+form button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+form button:hover {
+  background-color: #0056b3;
+}
+
+.category-group {
+  background: #eef6fb;
+  padding: 0.8rem 1rem;
+  margin-top: 1rem;
+  border-left: 4px solid #0288d1;
+  border-radius: 6px;
+}
+
+.transaction {
+  padding-left: 0.8rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.transaction-details {
+  flex-grow: 1;
+}
+
+.transaction-actions button {
+  margin-left: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.transaction-actions button.edit {
+  background-color: #007bff;
+  color: white;
+}
+
+.transaction-actions button.delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+.transaction-actions button.save {
+  background-color: #28a745;
+  color: white;
+}
+
+.transaction-actions button.cancel {
+  background-color: #6c757d;
+  color: white;
+}
+
+input.inline-edit {
+  font-size: 0.95rem;
+  padding: 0.1rem 0.3rem;
+  margin-right: 0.5rem;
+  width: auto;
+}
+
+#contentContainer {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+#transactionsSection,
+#chartSection {
+  flex: 1 1 400px;
+}
+
+#categoryChart {
+  max-width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  #contentContainer {
+    flex-direction: column;
+  }
+
+  #chartSection {
+    display: flex;
+    justify-content: center;
+  }
+}
