@@ -699,7 +699,7 @@
               date: dateInput.value,
               location: locationInput.value.trim(),
               amount: parseFloat(amountInput.value),
-              category: formattedCategory,
+              category: categorySelect.value,
             })
             .eq("id", tx.id);
 
@@ -712,7 +712,7 @@
               transactions[idx].date = dateInput.value;
               transactions[idx].location = locationInput.value.trim();
               transactions[idx].amount = parseFloat(amountInput.value);
-              transactions[idx].category = formattedCategory;
+              transactions[idx].category = categorySelect.value;
             }
             renderTransactions();
           }
