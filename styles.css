@@ -80,12 +80,21 @@ form,
 form input,
 form select,
 form button {
+  box-sizing: border-box; /* includes padding and border in width */
   width: 100%;
   padding: 0.6rem;
   margin: 0.6rem 0;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
+  /* add this line to vertically align */
+  vertical-align: middle;
+}
+
+/* Optional: set a consistent font-family to inputs and selects */
+form input,
+form select {
+  font-family: inherit;
 }
 
 form button {
