@@ -15,7 +15,7 @@ const categoryColors = {
   Utilities: "#4BC0C0",
   Subscriptions: "#9966FF",
   "Home Supplies": "#FF9F40",
-  Gas: "#E7E9ED",
+  Gas: "#FFD700",
   Gift: "#66BB6A",
   "Kids Stuff": "#FF6F61",
   "Eat Out": "#A569BD",
