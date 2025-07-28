@@ -175,8 +175,6 @@ form button:hover {
   padding: 1rem;
   margin-bottom: 1rem;
   background-color: #f9f9f9;
-  border-radius: 8px;
-  border: 1px solid #ddd;
 }
 
 .month-total-left {
