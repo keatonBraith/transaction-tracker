@@ -15,7 +15,7 @@ const categoryColors = {
   Utilities: "#4BC0C0",
   Subscriptions: "#9966FF",
   "Home Supplies": "#FF9F40",
-  Gas: "#FFD700",
+  Gas: "#E7E9ED",
   Gift: "#66BB6A",
   "Kids Stuff": "#FF6F61",
   "Eat Out": "#A569BD",
@@ -188,6 +188,12 @@ function renderTransactions() {
       '<p class="center-text">No transactions for this month.</p>';
     return;
   }
+
+  // ✅ Add this block to calculate and display the month total
+  const monthTotal = filtered.reduce((sum, tx) => sum + tx.amount, 0);
+  document.getElementById(
+    "monthTotal"
+  ).textContent = `Month Total: $${monthTotal.toFixed(2)}`;
 
   // Group by category
   const grouped = filtered.reduce((acc, tx) => {
