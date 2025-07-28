@@ -168,6 +168,16 @@ form button:hover {
   color: white;
 }
 
+.month-total {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  border-radius: 6px;
+}
+
 input.inline-edit {
   font-size: 0.95rem;
   padding: 0.1rem 0.3rem;
